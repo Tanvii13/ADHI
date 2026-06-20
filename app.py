@@ -25,3 +25,13 @@ async def describe_image(file: UploadFile = File(...)):
     return {
         "description": response.text
     }
+
+from fastapi import FastAPI
+
+app = FastAPI()
+
+@app.get("/")
+def root():
+    return {
+        "message": "ADHI Vision API is running successfully 🚀"
+    }
