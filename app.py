@@ -12,9 +12,15 @@ genai.configure(
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
+@app.get("/")
+def root():
+    return {
+        "message": "ADHI Vision API is running successfully 🚀"
+    }
+
+
 @app.post("/describe")
 async def describe_image(file: UploadFile = File(...)):
-
     image = Image.open(file.file)
 
     response = model.generate_content([
@@ -24,14 +30,4 @@ async def describe_image(file: UploadFile = File(...)):
 
     return {
         "description": response.text
-    }
-
-from fastapi import FastAPI
-
-app = FastAPI()
-
-@app.get("/")
-def root():
-    return {
-        "message": "ADHI Vision API is running successfully 🚀"
     }
