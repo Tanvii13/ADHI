@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'vision_page.dart';
+
 import '../widgets/navbar.dart';
 import '../widgets/hero_section.dart';
 import '../widgets/feature_card.dart';
@@ -32,20 +34,30 @@ class HomePage extends StatelessWidget {
               spacing: 24,
               runSpacing: 24,
               alignment: WrapAlignment.center,
-              children: const [
+              children: [
                 FeatureCard(
                   icon: Icons.visibility,
                   title: "Vision Assistant",
                   description:
                       "Describe surroundings and objects for visually impaired users.",
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const VisionPage(),
+                      ),
+                    );
+                  },
                 ),
-                FeatureCard(
+
+                const FeatureCard(
                   icon: Icons.record_voice_over,
                   title: "Speech Assistant",
                   description:
                       "Convert text into natural speech instantly.",
                 ),
-                FeatureCard(
+
+                const FeatureCard(
                   icon: Icons.hearing,
                   title: "Hearing Assistant",
                   description:

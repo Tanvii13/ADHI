@@ -4,51 +4,52 @@ class FeatureCard extends StatelessWidget {
   final IconData icon;
   final String title;
   final String description;
+  final VoidCallback? onTap;
 
   const FeatureCard({
     super.key,
     required this.icon,
     required this.title,
     required this.description,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: 280,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: Colors.greenAccent.withOpacity(0.3),
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: 320,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: const [
+            BoxShadow(
+              blurRadius: 10,
+              color: Colors.black12,
+            ),
+          ],
         ),
-      ),
-      child: Column(
-        children: [
-          Icon(
-            icon,
-            size: 50,
-            color: Colors.greenAccent,
-          ),
-          const SizedBox(height: 16),
-          Text(
-            title,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
+        child: Column(
+          children: [
+            Icon(icon, size: 60),
+            const SizedBox(height: 15),
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white70,
+            const SizedBox(height: 10),
+            Text(
+              description,
+              textAlign: TextAlign.center,
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
