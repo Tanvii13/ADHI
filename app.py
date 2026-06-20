@@ -12,13 +12,6 @@ genai.configure(
 model = genai.GenerativeModel("gemini-2.5-flash")
 
 
-@app.get("/")
-def root():
-    return {
-        "message": "ADHI Vision API is running successfully 🚀"
-    }
-
-
 @app.post("/describe")
 async def describe_image(file: UploadFile = File(...)):
     image = Image.open(file.file)
@@ -30,4 +23,19 @@ async def describe_image(file: UploadFile = File(...)):
 
     return {
         "description": response.text
+    }
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "ADHI Vision API is running successfully 🚀"
+    }
+
+
+# ADD THIS
+@app.get("/check")
+def check():
+    return {
+        "key_exists": os.getenv("GEMINI_API_KEY") is not None
     }
