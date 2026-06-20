@@ -45,14 +45,11 @@ class _VisionPageState extends State<VisionPage> {
     try {
       var request = http.MultipartRequest(
         "POST",
-        Uri.parse("http://127.0.0.1:8000/describe"),
+        Uri.parse("https://adhi-api.onrender.com/describe"),
       );
 
       request.files.add(
-        await http.MultipartFile.fromPath(
-          "file",
-          selectedFile!.path!,
-        ),
+        await http.MultipartFile.fromPath("file", selectedFile!.path!),
       );
 
       var response = await request.send();
@@ -78,9 +75,7 @@ class _VisionPageState extends State<VisionPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Vision Assistant"),
-      ),
+      appBar: AppBar(title: const Text("Vision Assistant")),
       body: SingleChildScrollView(
         child: Center(
           child: Padding(
@@ -89,17 +84,11 @@ class _VisionPageState extends State<VisionPage> {
               children: [
                 const SizedBox(height: 20),
 
-                const Icon(
-                  Icons.visibility,
-                  size: 100,
-                ),
+                const Icon(Icons.visibility, size: 100),
 
                 const SizedBox(height: 20),
 
-                Text(
-                  fileName,
-                  textAlign: TextAlign.center,
-                ),
+                Text(fileName, textAlign: TextAlign.center),
 
                 const SizedBox(height: 20),
 
@@ -110,8 +99,7 @@ class _VisionPageState extends State<VisionPage> {
 
                 const SizedBox(height: 30),
 
-                if (isLoading)
-                  const CircularProgressIndicator(),
+                if (isLoading) const CircularProgressIndicator(),
 
                 if (!isLoading && description.isNotEmpty)
                   Container(
