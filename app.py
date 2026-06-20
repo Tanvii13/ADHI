@@ -1,6 +1,7 @@
 from fastapi import FastAPI, UploadFile, File
 import google.generativeai as genai
 from PIL import Image
+import os
 
 app = FastAPI()
 
