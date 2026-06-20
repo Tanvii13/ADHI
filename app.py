@@ -14,28 +14,19 @@ model = genai.GenerativeModel("gemini-2.5-flash")
 
 @app.post("/describe")
 async def describe_image(file: UploadFile = File(...)):
-    image = Image.open(file.file)
+    try:
+        image = Image.open(file.file)
 
-    response = model.generate_content([
-        "Describe this image for a blind person.",
-        image
-    ])
+        response = model.generate_content([
+            "Describe this image for a blind person.",
+            image
+        ])
 
-    return {
-        "description": response.text
-    }
+        return {
+            "description": response.text
+        }
 
-
-@app.get("/")
-def root():
-    return {
-        "message": "ADHI Vision API is running successfully 🚀"
-    }
-
-
-# ADD THIS
-@app.get("/check")
-def check():
-    return {
-        "key_exists": os.getenv("GEMINI_API_KEY") is not None
-    }
+    except Exception as e:
+        return {
+            "error": str(e)
+        }
