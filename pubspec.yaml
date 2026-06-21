@@ -21,11 +21,10 @@ dev_dependencies:
 
   flutter_lints: ^6.0.0
 
-fflutter:
-  uses-material-design: true
-
+flutter:
   assets:
-    - logo.jpg
-    - blind.png
-    - deaf.png
-    - mute.png
+    - assets/logo.jpg
+    - assets/blind.png
+    - assets/deaf.png
+    - assets/mute.png
+
