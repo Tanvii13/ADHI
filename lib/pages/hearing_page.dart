@@ -1,10 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:record/record.dart';
+
+import '../widgets/app_shell.dart';
 
 /// Hearing Assistant: records a short clip of ambient audio/speech and
 /// sends it to the `/transcribe` endpoint, which returns a transcript plus
@@ -18,6 +21,9 @@ class HearingPage extends StatefulWidget {
 
 class _HearingPageState extends State<HearingPage> {
   static const String _apiBase = "https://adhi-api.onrender.com";
+  static const List<String> _watchedSounds = [
+    "Siren", "Smoke alarm", "Shouting", "Knocking", "Doorbell",
+  ];
 
   final AudioRecorder _recorder = AudioRecorder();
 
@@ -51,14 +57,15 @@ class _HearingPageState extends State<HearingPage> {
       return;
     }
 
-    final dir = await getTemporaryDirectory();
-    final filePath =
-        "${dir.path}/adhi_clip_${DateTime.now().millisecondsSinceEpoch}.wav";
+    String filePath;
+    if (kIsWeb) {
+      filePath = "adhi_clip.wav";
+    } else {
+      final dir = await getTemporaryDirectory();
+      filePath = "${dir.path}/adhi_clip_${DateTime.now().millisecondsSinceEpoch}.wav";
+    }
 
-    await _recorder.start(
-      const RecordConfig(encoder: AudioEncoder.wav),
-      path: filePath,
-    );
+    await _recorder.start(const RecordConfig(encoder: AudioEncoder.wav), path: filePath);
 
     setState(() {
       _isRecording = true;
@@ -76,10 +83,7 @@ class _HearingPageState extends State<HearingPage> {
     });
 
     try {
-      final request = http.MultipartRequest(
-        "POST",
-        Uri.parse("$_apiBase/transcribe"),
-      );
+      final request = http.MultipartRequest("POST", Uri.parse("$_apiBase/transcribe"));
       request.files.add(await http.MultipartFile.fromPath("file", path));
 
       final streamedResponse = await request.send();
@@ -99,7 +103,7 @@ class _HearingPageState extends State<HearingPage> {
       setState(() => _error = "Could not reach the hearing assistant: $e");
     } finally {
       setState(() => _isLoading = false);
-      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS || Platform.isWindows || Platform.isLinux) {
+      if (!kIsWeb) {
         final file = File(path);
         if (await file.exists()) {
           await file.delete();
@@ -110,41 +114,44 @@ class _HearingPageState extends State<HearingPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF062211),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF062211),
-        foregroundColor: Colors.white,
-        title: const Text("Hearing Assistant"),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(30),
+    return AppPageShell(
+      currentRoute: '/hearing',
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+        child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: 760),
             child: Column(
               children: [
-                const SizedBox(height: 10),
-                Icon(
-                  Icons.hearing,
-                  size: 90,
-                  color: _urgent ? const Color(0xFFE5484D) : Colors.white,
-                ),
+                Icon(Icons.hearing, size: 90, color: _urgent ? const Color(0xFFE5484D) : Colors.white),
                 const SizedBox(height: 16),
-                Text(
-                  _isRecording
-                      ? "Listening..."
-                      : "Tap to record a few seconds of audio",
-                  style: const TextStyle(color: Colors.white70, fontSize: 16),
+                const Text("Hearing Assistant",
+                    style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                const Text(
+                  "Record a few seconds of audio. ADHI transcribes speech and\nflags urgent sounds like sirens or smoke alarms.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.5),
                 ),
                 const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: _watchedSounds.map((s) => _Chip(s)).toList(),
+                ),
+                const SizedBox(height: 28),
+                Text(
+                  _isRecording ? "Listening..." : "Tap to start recording",
+                  style: const TextStyle(color: Colors.white70, fontSize: 14),
+                ),
+                const SizedBox(height: 16),
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _toggleRecording,
                   icon: Icon(_isRecording ? Icons.stop : Icons.mic),
                   label: Text(_isRecording ? "Stop & Transcribe" : "Start Recording"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        _isRecording ? const Color(0xFFE5484D) : const Color(0xFFB7E63E),
+                    backgroundColor: _isRecording ? const Color(0xFFE5484D) : const Color(0xFFB7E63E),
                     foregroundColor: const Color(0xFF062211),
                     padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
@@ -152,17 +159,7 @@ class _HearingPageState extends State<HearingPage> {
                 ),
                 const SizedBox(height: 30),
                 if (_isLoading) const CircularProgressIndicator(color: Colors.white),
-                if (_error != null)
-                  Container(
-                    margin: const EdgeInsets.only(top: 10),
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFE5484D).withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: const Color(0xFFE5484D)),
-                    ),
-                    child: Text(_error!, style: const TextStyle(color: Colors.white)),
-                  ),
+                if (_error != null) _ErrorPanel(message: _error!),
                 if (!_isLoading && _transcript.isNotEmpty)
                   Container(
                     margin: const EdgeInsets.only(top: 10),
@@ -177,21 +174,15 @@ class _HearingPageState extends State<HearingPage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         const Text("Transcript",
-                            style: TextStyle(
-                                color: Color(0xFFB7E63E),
-                                fontWeight: FontWeight.bold,
-                                fontSize: 14)),
+                            style: TextStyle(color: Color(0xFFB7E63E), fontWeight: FontWeight.bold, fontSize: 14)),
                         const SizedBox(height: 8),
-                        Text(_transcript,
-                            style: const TextStyle(color: Colors.white, fontSize: 16)),
+                        Text(_transcript, style: const TextStyle(color: Colors.white, fontSize: 16)),
                         const SizedBox(height: 16),
                         Row(
                           children: [
                             Icon(
                               _urgent ? Icons.warning_amber_rounded : Icons.check_circle,
-                              color: _urgent
-                                  ? const Color(0xFFE5484D)
-                                  : const Color(0xFFB7E63E),
+                              color: _urgent ? const Color(0xFFE5484D) : const Color(0xFFB7E63E),
                               size: 18,
                             ),
                             const SizedBox(width: 8),
@@ -209,6 +200,43 @@ class _HearingPageState extends State<HearingPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _ErrorPanel extends StatelessWidget {
+  final String message;
+  const _ErrorPanel({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFE5484D).withOpacity(0.15),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5484D)),
+      ),
+      child: Text(message, style: const TextStyle(color: Colors.white)),
+    );
+  }
+}
+
+class _Chip extends StatelessWidget {
+  final String label;
+  const _Chip(this.label);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white24),
+      ),
+      child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
     );
   }
 }

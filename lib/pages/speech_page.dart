@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../widgets/app_shell.dart';
+
 /// Voice Assistant: converts typed phrases into digital speech entirely
 /// on-device via flutter_tts (no backend round-trip needed).
 class SpeechPage extends StatefulWidget {
@@ -11,6 +13,10 @@ class SpeechPage extends StatefulWidget {
 }
 
 class _SpeechPageState extends State<SpeechPage> {
+  static const List<String> _quickPhrases = [
+    "Yes", "No", "Thank you", "Please wait", "I need help", "Excuse me",
+  ];
+
   final FlutterTts _tts = FlutterTts();
   final TextEditingController _controller = TextEditingController();
 
@@ -33,11 +39,11 @@ class _SpeechPageState extends State<SpeechPage> {
     super.dispose();
   }
 
-  Future<void> _speak() async {
-    final text = _controller.text.trim();
-    if (text.isEmpty) return;
+  Future<void> _speak([String? text]) async {
+    final toSpeak = (text ?? _controller.text).trim();
+    if (toSpeak.isEmpty) return;
     await _tts.setSpeechRate(_rate);
-    await _tts.speak(text);
+    await _tts.speak(toSpeak);
   }
 
   Future<void> _stop() async {
@@ -47,26 +53,39 @@ class _SpeechPageState extends State<SpeechPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF062211),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF062211),
-        foregroundColor: Colors.white,
-        title: const Text("Voice Assistant"),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(30),
+    return AppPageShell(
+      currentRoute: '/speech',
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+        child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: 760),
             child: Column(
               children: [
                 const Icon(Icons.record_voice_over, size: 90, color: Colors.white),
                 const SizedBox(height: 16),
+                const Text("Voice Assistant",
+                    style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
                 const Text(
-                  "Type a phrase below and ADHI will speak it aloud for you.",
+                  "Type a phrase, or tap a quick phrase below, and ADHI will speak it aloud.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.5),
+                ),
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: _quickPhrases
+                      .map((p) => ActionChip(
+                            label: Text(p),
+                            backgroundColor: Colors.white.withOpacity(0.08),
+                            labelStyle: const TextStyle(color: Colors.white),
+                            side: const BorderSide(color: Colors.white24),
+                            onPressed: () => _speak(p),
+                          ))
+                      .toList(),
                 ),
                 const SizedBox(height: 24),
                 TextField(
@@ -105,7 +124,7 @@ class _SpeechPageState extends State<SpeechPage> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton.icon(
-                      onPressed: _isSpeaking ? null : _speak,
+                      onPressed: _isSpeaking ? null : () => _speak(),
                       icon: const Icon(Icons.volume_up),
                       label: const Text("Speak"),
                       style: ElevatedButton.styleFrom(

@@ -1,20 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/app_shell.dart';
+
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFF062211),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF062211),
-        foregroundColor: Colors.white,
-        title: const Text("About ADHI"),
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(40),
+    return AppPageShell(
+      currentRoute: '/about',
+      body: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 24),
+        child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 700),
             child: Column(
@@ -22,8 +19,7 @@ class AboutPage extends StatelessWidget {
               children: [
                 const Text(
                   "ADHI: AI for Independence, Inclusion & Sight",
-                  style: TextStyle(
-                      color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 20),
                 const Text(
@@ -37,14 +33,9 @@ class AboutPage extends StatelessWidget {
                 const SizedBox(height: 24),
                 const Text(
                   "Accessibility is not a privilege; it is a right.",
-                  style: TextStyle(
-                      color: Color(0xFFB7E63E), fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: Color(0xFFB7E63E), fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 40),
-                const Text(
-                  "Made with ❤️ by Tanvi",
-                  style: TextStyle(color: Colors.white54, fontSize: 14),
-                ),
               ],
             ),
           ),
@@ -70,8 +61,7 @@ class _Bullet extends StatelessWidget {
             child: Icon(Icons.circle, size: 6, color: Color(0xFFB7E63E)),
           ),
           Expanded(
-            child: Text(text,
-                style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.5)),
+            child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.5)),
           ),
         ],
       ),
