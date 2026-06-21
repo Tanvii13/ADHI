@@ -32,3 +32,4 @@ flutter:
     - assets/deaf.png
     - assets/mute.png
 
+flutter_tts: ^4.2.3
