@@ -19,6 +19,10 @@
       "src": "/(.*)",
       "dest": "build/web/$1",
       "check": true
+    },
+    {
+      "src": "/(.*)",
+      "dest": "build/web/index.html"
     }
   ]
 }
