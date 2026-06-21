@@ -60,17 +60,17 @@ class AdhiHomePage extends StatelessWidget {
               builder: (context, constraints) {
                 final cards = [
                   _GlassFeatureCard(
-                    imagePath: 'assets/deaf.png',
-                    description:
-                        'Giving ears to 70 million people by translating spoken words into live screen text.',
-                    onTap: () => Navigator.pushNamed(context, '/hearing'),
-                  ),
-
-                  _GlassFeatureCard(
                     imagePath: 'assets/blind.png',
                     description:
                         'Giving eyes to 1 billion people by turning camera views into spoken descriptions.',
                     onTap: () => Navigator.pushNamed(context, '/vision'),
+                  ),
+
+                  _GlassFeatureCard(
+                    imagePath: 'assets/deaf.png',
+                    description:
+                        'Giving ears to 70 million people by translating spoken words into live screen text.',
+                    onTap: () => Navigator.pushNamed(context, '/hearing'),
                   ),
 
                   _GlassFeatureCard(
@@ -141,50 +141,62 @@ class _GlassFeatureCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(22),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(22),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
-          child: Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(22),
-              border: Border.all(color: Colors.white.withOpacity(0.12)),
-              gradient: LinearGradient(
-                colors: [
-                  Colors.white.withOpacity(0.10),
-                  Colors.white.withOpacity(0.03),
-                ],
-              ),
-            ),
-            child: Column(
-              children: [
-                SizedBox(
-                  height: 370,
-                  width: double.infinity,
-                  child: Image.asset(imagePath, fit: BoxFit.cover),
-                ),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.green.withOpacity(0.15),
-                  ),
-                  child: Text(
-                    description,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      height: 1.6,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ),
-              ],
+      hoverColor: Colors.transparent,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // --- Image ---
+          ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: SizedBox(
+              height: 280,
+              width: double.infinity,
+              child: Image.asset(imagePath, fit: BoxFit.cover),
             ),
           ),
-        ),
+
+          const SizedBox(height: 22),
+
+          // --- Floating glass caption card ---
+          ClipRRect(
+            borderRadius: BorderRadius.circular(18),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 22),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: Colors.white.withOpacity(0.16)),
+                  gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [
+                      Colors.white.withOpacity(0.14),
+                      Colors.white.withOpacity(0.04),
+                    ],
+                  ),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.35),
+                      blurRadius: 22,
+                      offset: const Offset(0, 14),
+                    ),
+                  ],
+                ),
+                child: Text(
+                  description,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    height: 1.55,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
