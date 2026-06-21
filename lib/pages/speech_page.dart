@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../theme.dart';
 import '../widgets/app_shell.dart';
+import '../widgets/glass.dart';
 
 /// Voice Assistant: converts typed phrases into digital speech entirely
 /// on-device via flutter_tts (no backend round-trip needed).
@@ -56,99 +58,154 @@ class _SpeechPageState extends State<SpeechPage> {
     return AppPageShell(
       currentRoute: '/speech',
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 56, horizontal: 30),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
+            constraints: const BoxConstraints(maxWidth: 880),
             child: Column(
               children: [
-                const Icon(Icons.record_voice_over, size: 90, color: Colors.white),
-                const SizedBox(height: 16),
-                const Text("Voice Assistant",
-                    style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                const Text(
-                  "Type a phrase, or tap a quick phrase below, and ADHI will speak it aloud.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.5),
+                SectionHeader(
+                  title: "Voice Assistant",
+                  subtitle:
+                      "Type a phrase, or tap a quick phrase below,\nand ADHI will speak it aloud for you.",
+                  icon: Icons.record_voice_over_rounded,
                 ),
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 36),
+
                 Wrap(
                   alignment: WrapAlignment.center,
-                  spacing: 10,
-                  runSpacing: 10,
+                  spacing: 12,
+                  runSpacing: 12,
                   children: _quickPhrases
-                      .map((p) => ActionChip(
-                            label: Text(p),
-                            backgroundColor: Colors.white.withOpacity(0.08),
-                            labelStyle: const TextStyle(color: Colors.white),
-                            side: const BorderSide(color: Colors.white24),
-                            onPressed: () => _speak(p),
+                      .map((p) => _QuickPhraseChip(
+                            label: p,
+                            onTap: () => _speak(p),
                           ))
                       .toList(),
                 ),
-                const SizedBox(height: 24),
-                TextField(
-                  controller: _controller,
-                  maxLines: 4,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    hintText: "Type what you want to say...",
-                    hintStyle: const TextStyle(color: Colors.white38),
-                    filled: true,
-                    fillColor: Colors.white.withOpacity(0.08),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.all(18),
+
+                const SizedBox(height: 36),
+
+                GlassPanel(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(Icons.edit_note_rounded,
+                              color: AppColors.accentLime, size: 24),
+                          const SizedBox(width: 8),
+                          const Text(
+                            "What would you like to say?",
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 16),
+                      GlassTextField(
+                        controller: _controller,
+                        hintText: "Type what you want to say...",
+                      ),
+                      const SizedBox(height: 22),
+                      Row(
+                        children: [
+                          const Icon(Icons.speed_rounded,
+                              color: Colors.white70, size: 20),
+                          const SizedBox(width: 10),
+                          const Text("Speed",
+                              style: TextStyle(
+                                  color: Colors.white70,
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w600)),
+                          Expanded(
+                            child: SliderTheme(
+                              data: SliderTheme.of(context).copyWith(
+                                activeTrackColor: AppColors.accentLime,
+                                inactiveTrackColor: Colors.white24,
+                                thumbColor: AppColors.accentLime,
+                                overlayColor:
+                                    AppColors.accentLime.withOpacity(0.2),
+                                trackHeight: 4,
+                              ),
+                              child: Slider(
+                                value: _rate,
+                                min: 0.1,
+                                max: 1.0,
+                                onChanged: (v) => setState(() => _rate = v),
+                              ),
+                            ),
+                          ),
+                          Text(
+                            "${(_rate * 100).round()}%",
+                            style: const TextStyle(
+                                color: Colors.white70,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w600),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 28),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          PremiumButton(
+                            label: "Speak",
+                            icon: Icons.volume_up_rounded,
+                            onPressed: _isSpeaking ? null : () => _speak(),
+                          ),
+                          const SizedBox(width: 16),
+                          PremiumButton(
+                            label: "Stop",
+                            icon: Icons.stop_rounded,
+                            outlined: true,
+                            onPressed: _isSpeaking ? _stop : null,
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 16),
-                Row(
-                  children: [
-                    const Text("Speed", style: TextStyle(color: Colors.white70)),
-                    Expanded(
-                      child: Slider(
-                        value: _rate,
-                        min: 0.1,
-                        max: 1.0,
-                        activeColor: const Color(0xFFB7E63E),
-                        onChanged: (v) => setState(() => _rate = v),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: _isSpeaking ? null : () => _speak(),
-                      icon: const Icon(Icons.volume_up),
-                      label: const Text("Speak"),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFFB7E63E),
-                        foregroundColor: const Color(0xFF062211),
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    OutlinedButton.icon(
-                      onPressed: _isSpeaking ? _stop : null,
-                      icon: const Icon(Icons.stop),
-                      label: const Text("Stop"),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        side: const BorderSide(color: Colors.white),
-                        padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                      ),
-                    ),
-                  ],
-                ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickPhraseChip extends StatelessWidget {
+  final String label;
+  final VoidCallback onTap;
+
+  const _QuickPhraseChip({required this.label, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.white.withOpacity(0.08),
+      borderRadius: BorderRadius.circular(24),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white24),
+          ),
+          child: Text(
+            label,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ),

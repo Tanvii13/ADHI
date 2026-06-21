@@ -20,6 +20,16 @@ class VisionPage extends StatefulWidget {
 class _VisionPageState extends State<VisionPage> {
   static const String _apiBase = "https://adhi-api.onrender.com";
 
+  // Render's free tier spins the service down after ~15 min idle. The
+  // first request after that can fail or hang while it cold-starts, so
+  // we retry a few times with backoff instead of showing a scary error
+  // on the very first attempt.
+  static const List<Duration> _retryDelays = [
+    Duration(seconds: 4),
+    Duration(seconds: 8),
+    Duration(seconds: 12),
+  ];
+
   PlatformFile? selectedFile;
 
   String fileName = "No image selected";
@@ -29,6 +39,7 @@ class _VisionPageState extends State<VisionPage> {
   String? textDetected;
   bool isLoading = false;
   String? error;
+  String? statusMessage;
 
   Future<void> pickImage() async {
     final result = await FilePicker.platform.pickFiles(type: FileType.image);
@@ -42,6 +53,48 @@ class _VisionPageState extends State<VisionPage> {
     await uploadImage();
   }
 
+  Future<http.StreamedResponse> _sendWithRetry(
+    Future<http.MultipartRequest> Function() buildRequest,
+  ) async {
+    Object? lastError;
+
+    for (var attempt = 0; attempt <= _retryDelays.length; attempt++) {
+      try {
+        final request = await buildRequest();
+        return await request.send();
+      } catch (e) {
+        lastError = e;
+
+        if (attempt < _retryDelays.length) {
+          setState(() {
+            statusMessage =
+                "The assistant is waking up (this can take a little while on the first request)…";
+          });
+          await Future.delayed(_retryDelays[attempt]);
+        }
+      }
+    }
+
+    throw lastError ?? Exception("Unknown error contacting the assistant");
+  }
+
+  Future<http.MultipartRequest> _buildRequest() async {
+    final request = http.MultipartRequest("POST", Uri.parse("$_apiBase/describe"));
+
+    if (selectedFile!.bytes != null) {
+      // Web: no real file path, use in-memory bytes instead.
+      request.files.add(http.MultipartFile.fromBytes(
+        "file",
+        selectedFile!.bytes!,
+        filename: selectedFile!.name,
+      ));
+    } else if (selectedFile!.path != null) {
+      request.files.add(await http.MultipartFile.fromPath("file", selectedFile!.path!));
+    }
+
+    return request;
+  }
+
   Future<void> uploadImage() async {
     if (selectedFile == null) return;
 
@@ -52,23 +105,11 @@ class _VisionPageState extends State<VisionPage> {
       hazards = [];
       textDetected = null;
       error = null;
+      statusMessage = null;
     });
 
     try {
-      final request = http.MultipartRequest("POST", Uri.parse("$_apiBase/describe"));
-
-      if (selectedFile!.bytes != null) {
-        // Web: no real file path, use in-memory bytes instead.
-        request.files.add(http.MultipartFile.fromBytes(
-          "file",
-          selectedFile!.bytes!,
-          filename: selectedFile!.name,
-        ));
-      } else if (selectedFile!.path != null) {
-        request.files.add(await http.MultipartFile.fromPath("file", selectedFile!.path!));
-      }
-
-      final response = await request.send();
+      final response = await _sendWithRetry(_buildRequest);
       final responseBody = await response.stream.bytesToString();
       final data = jsonDecode(responseBody);
 
@@ -83,10 +124,14 @@ class _VisionPageState extends State<VisionPage> {
         });
       }
     } catch (e) {
-      setState(() => error = "Could not reach the vision assistant: $e");
+      setState(() => error =
+          "Could not reach the vision assistant after several attempts. It may be waking up from sleep — please try again in a moment.\n($e)");
     }
 
-    setState(() => isLoading = false);
+    setState(() {
+      isLoading = false;
+      statusMessage = null;
+    });
   }
 
   @override
@@ -130,7 +175,17 @@ class _VisionPageState extends State<VisionPage> {
                   ),
                 ),
                 const SizedBox(height: 30),
-                if (isLoading) const CircularProgressIndicator(color: Colors.white),
+                if (isLoading) ...[
+                  const CircularProgressIndicator(color: Colors.white),
+                  if (statusMessage != null) ...[
+                    const SizedBox(height: 14),
+                    Text(
+                      statusMessage!,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(color: Colors.white70, fontSize: 14),
+                    ),
+                  ],
+                ],
                 if (error != null)
                   _ErrorPanel(message: error!),
                 if (!isLoading && description.isNotEmpty) ...[

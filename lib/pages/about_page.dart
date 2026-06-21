@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
 import '../widgets/app_shell.dart';
+import '../widgets/glass.dart';
 
 class AboutPage extends StatelessWidget {
   const AboutPage({super.key});
@@ -10,32 +12,188 @@ class AboutPage extends StatelessWidget {
     return AppPageShell(
       currentRoute: '/about',
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 64, horizontal: 24),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 700),
+            constraints: const BoxConstraints(maxWidth: 1000),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "ADHI: AI for Independence, Inclusion & Sight",
-                  style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 20),
-                const Text(
-                  "ADHI is an accessibility platform that gives:",
-                  style: TextStyle(color: Colors.white70, fontSize: 16, height: 1.6),
+                Text(
+                  "ADHI",
+                  style: TextStyle(
+                    color: AppColors.accentLime,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 4,
+                  ),
                 ),
                 const SizedBox(height: 16),
-                const _Bullet("Sight — describing the world to the 1 billion+ people who are blind or low-vision."),
-                const _Bullet("Hearing — turning spoken words and urgent sounds into live text for the 70 million+ who are deaf or hard of hearing."),
-                const _Bullet("Voice — converting typed phrases into natural speech for the 6.5 million+ who are nonverbal or speech-impaired."),
-                const SizedBox(height: 24),
                 const Text(
-                  "Accessibility is not a privilege; it is a right.",
-                  style: TextStyle(color: Color(0xFFB7E63E), fontSize: 18, fontWeight: FontWeight.bold),
+                  "AI for Independence,\nInclusion & Sight",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 52,
+                    fontWeight: FontWeight.w800,
+                    height: 1.15,
+                    letterSpacing: -0.5,
+                  ),
                 ),
-                const SizedBox(height: 40),
+                const SizedBox(height: 24),
+                Text(
+                  "ADHI is an accessibility platform that gives sight, hearing\n"
+                  "and a voice back to the people who need it most — built on\n"
+                  "the belief that the world should adapt to people, not the other way around.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.78),
+                    fontSize: 19,
+                    height: 1.6,
+                  ),
+                ),
+
+                const SizedBox(height: 56),
+
+                // Three pillar cards
+                LayoutBuilder(builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 760;
+                  final cards = [
+                    _PillarCard(
+                      icon: Icons.remove_red_eye_rounded,
+                      title: "Sight",
+                      stat: "1B+",
+                      description:
+                          "Describing the world in real time to the billion-plus people who are blind or low-vision.",
+                    ),
+                    _PillarCard(
+                      icon: Icons.hearing_rounded,
+                      title: "Hearing",
+                      stat: "70M+",
+                      description:
+                          "Turning spoken words and urgent sounds into live, readable text for the deaf and hard of hearing.",
+                    ),
+                    _PillarCard(
+                      icon: Icons.record_voice_over_rounded,
+                      title: "Voice",
+                      stat: "6.5M+",
+                      description:
+                          "Converting typed phrases into natural speech for people who are nonverbal or speech-impaired.",
+                    ),
+                  ];
+
+                  if (isWide) {
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: cards
+                          .map((c) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: c,
+                                ),
+                              ))
+                          .toList(),
+                    );
+                  }
+                  return Column(
+                    children: cards
+                        .map((c) => Padding(
+                              padding: const EdgeInsets.only(bottom: 20),
+                              child: c,
+                            ))
+                        .toList(),
+                  );
+                }),
+
+                const SizedBox(height: 56),
+
+                // Mission statement banner
+                GlassPanel(
+                  padding: const EdgeInsets.symmetric(vertical: 44, horizontal: 36),
+                  child: Column(
+                    children: [
+                      Icon(Icons.shield_moon_rounded,
+                          color: AppColors.accentLime, size: 40),
+                      const SizedBox(height: 18),
+                      const Text(
+                        "Accessibility is not a privilege; it is a right.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w800,
+                          height: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 14),
+                      Text(
+                        "The World Adapts To You.",
+                        style: TextStyle(
+                          color: AppColors.accentLime,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 56),
+
+                // How it works strip
+                const Text(
+                  "How ADHI Works",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 30,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 28),
+                LayoutBuilder(builder: (context, constraints) {
+                  final isWide = constraints.maxWidth > 760;
+                  final steps = [
+                    _StepCard(
+                      number: "01",
+                      title: "Capture",
+                      description:
+                          "Point a camera, speak, or type — ADHI listens through whichever sense you need supported.",
+                    ),
+                    _StepCard(
+                      number: "02",
+                      title: "Understand",
+                      description:
+                          "On-device and cloud AI models interpret speech, sound, and surroundings in real time.",
+                    ),
+                    _StepCard(
+                      number: "03",
+                      title: "Respond",
+                      description:
+                          "ADHI speaks, displays, or alerts — translating one sense into another, instantly.",
+                    ),
+                  ];
+                  if (isWide) {
+                    return Row(
+                      children: steps
+                          .map((s) => Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  child: s,
+                                ),
+                              ))
+                          .toList(),
+                    );
+                  }
+                  return Column(
+                    children: steps
+                        .map((s) => Padding(
+                              padding: const EdgeInsets.only(bottom: 18),
+                              child: s,
+                            ))
+                        .toList(),
+                  );
+                }),
+
+                const SizedBox(height: 48),
               ],
             ),
           ),
@@ -45,23 +203,115 @@ class AboutPage extends StatelessWidget {
   }
 }
 
-class _Bullet extends StatelessWidget {
-  final String text;
-  const _Bullet(this.text);
+class _PillarCard extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String stat;
+  final String description;
+
+  const _PillarCard({
+    required this.icon,
+    required this.title,
+    required this.stat,
+    required this.description,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: Row(
+    return GlassPanel(
+      padding: const EdgeInsets.all(28),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.only(top: 6, right: 10),
-            child: Icon(Icons.circle, size: 6, color: Color(0xFFB7E63E)),
+          Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: AppColors.accentLime.withOpacity(0.15),
+            ),
+            child: Icon(icon, color: AppColors.accentLime, size: 30),
           ),
-          Expanded(
-            child: Text(text, style: const TextStyle(color: Colors.white70, fontSize: 15, height: 1.5)),
+          const SizedBox(height: 20),
+          Text(
+            stat,
+            style: TextStyle(
+              color: AppColors.accentLime,
+              fontSize: 26,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.75),
+              fontSize: 16,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _StepCard extends StatelessWidget {
+  final String number;
+  final String title;
+  final String description;
+
+  const _StepCard({
+    required this.number,
+    required this.title,
+    required this.description,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(26),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withOpacity(0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            number,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.25),
+              fontSize: 36,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 20,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            description,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.72),
+              fontSize: 15,
+              height: 1.5,
+            ),
           ),
         ],
       ),
