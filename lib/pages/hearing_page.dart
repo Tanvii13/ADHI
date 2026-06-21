@@ -9,9 +9,6 @@ import 'package:record/record.dart';
 
 import '../widgets/app_shell.dart';
 
-/// Hearing Assistant: records a short clip of ambient audio/speech and
-/// sends it to the `/transcribe` endpoint, which returns a transcript plus
-/// an urgent-sound classification (siren, smoke alarm, shouting, etc.).
 class HearingPage extends StatefulWidget {
   const HearingPage({super.key});
 
@@ -21,8 +18,13 @@ class HearingPage extends StatefulWidget {
 
 class _HearingPageState extends State<HearingPage> {
   static const String _apiBase = "https://adhi-api.onrender.com";
+
   static const List<String> _watchedSounds = [
-    "Siren", "Smoke alarm", "Shouting", "Knocking", "Doorbell",
+    "Siren",
+    "Smoke Alarm",
+    "Shouting",
+    "Knocking",
+    "Doorbell",
   ];
 
   final AudioRecorder _recorder = AudioRecorder();
@@ -31,7 +33,7 @@ class _HearingPageState extends State<HearingPage> {
   bool _isLoading = false;
 
   String _transcript = "";
-  String _soundEvent = "none";
+  String _soundEvent = "None";
   bool _urgent = false;
   String? _error;
 
@@ -44,35 +46,43 @@ class _HearingPageState extends State<HearingPage> {
   Future<void> _toggleRecording() async {
     if (_isRecording) {
       final path = await _recorder.stop();
-      setState(() => _isRecording = false);
+
+      setState(() {
+        _isRecording = false;
+      });
+
       if (path != null) {
         await _uploadAudio(path);
       }
+
       return;
     }
 
     final hasPermission = await _recorder.hasPermission();
+
     if (!hasPermission) {
-      setState(() => _error = "Microphone permission was denied.");
+      setState(() {
+        _error = "Microphone permission denied";
+      });
       return;
     }
 
-    String filePath;
-    if (kIsWeb) {
-      filePath = "adhi_clip.wav";
-    } else {
+    String filePath = "recording.wav";
+
+    if (!kIsWeb) {
       final dir = await getTemporaryDirectory();
-      filePath = "${dir.path}/adhi_clip_${DateTime.now().millisecondsSinceEpoch}.wav";
+      filePath = "${dir.path}/recording.wav";
     }
 
-    await _recorder.start(const RecordConfig(encoder: AudioEncoder.wav), path: filePath);
+    await _recorder.start(
+      const RecordConfig(encoder: AudioEncoder.wav),
+      path: filePath,
+    );
 
     setState(() {
       _isRecording = true;
       _error = null;
       _transcript = "";
-      _soundEvent = "none";
-      _urgent = false;
     });
   }
 
@@ -83,28 +93,44 @@ class _HearingPageState extends State<HearingPage> {
     });
 
     try {
-      final request = http.MultipartRequest("POST", Uri.parse("$_apiBase/transcribe"));
+      if (kIsWeb) {
+        setState(() {
+          _error =
+              "Audio upload from browser is limited. Test Hearing Assistant on Android/Desktop.";
+        });
+        return;
+      }
+
+      final request = http.MultipartRequest(
+        "POST",
+        Uri.parse("$_apiBase/transcribe"),
+      );
+
       request.files.add(await http.MultipartFile.fromPath("file", path));
 
-      final streamedResponse = await request.send();
-      final body = await streamedResponse.stream.bytesToString();
+      final response = await request.send();
+
+      final body = await response.stream.bytesToString();
+
       final data = jsonDecode(body);
 
-      if (data is Map && data.containsKey("error")) {
-        setState(() => _error = data["error"].toString());
-      } else {
-        setState(() {
-          _transcript = data["transcript"] ?? "";
-          _soundEvent = data["sound_event"] ?? "none";
-          _urgent = data["urgent"] == true;
-        });
-      }
+      setState(() {
+        _transcript = data["transcript"] ?? "";
+        _soundEvent = data["sound_event"] ?? "None";
+        _urgent = data["urgent"] ?? false;
+      });
     } catch (e) {
-      setState(() => _error = "Could not reach the hearing assistant: $e");
+      setState(() {
+        _error = "Error: $e";
+      });
     } finally {
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+      });
+
       if (!kIsWeb) {
         final file = File(path);
+
         if (await file.exists()) {
           await file.delete();
         }
@@ -117,80 +143,115 @@ class _HearingPageState extends State<HearingPage> {
     return AppPageShell(
       currentRoute: '/hearing',
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 40, horizontal: 24),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
         child: Center(
           child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 760),
+            constraints: const BoxConstraints(maxWidth: 900),
             child: Column(
               children: [
-                Icon(Icons.hearing, size: 90, color: _urgent ? const Color(0xFFE5484D) : Colors.white),
-                const SizedBox(height: 16),
-                const Text("Hearing Assistant",
-                    style: TextStyle(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                const Text(
-                  "Record a few seconds of audio. ADHI transcribes speech and\nflags urgent sounds like sirens or smoke alarms.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.white70, fontSize: 15, height: 1.5),
+                Icon(
+                  Icons.hearing,
+                  size: 100,
+                  color: _urgent
+                      ? const Color(0xFFE5484D)
+                      : const Color(0xFFB7E63E),
                 ),
-                const SizedBox(height: 24),
+
+                const SizedBox(height: 20),
+
+                const Text(
+                  "Hearing Assistant",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 42,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+
+                const SizedBox(height: 15),
+
+                const Text(
+                  "Record speech and convert it into readable text instantly.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white70, fontSize: 20),
+                ),
+
+                const SizedBox(height: 30),
+
                 Wrap(
-                  alignment: WrapAlignment.center,
                   spacing: 10,
                   runSpacing: 10,
-                  children: _watchedSounds.map((s) => _Chip(s)).toList(),
+                  children: _watchedSounds
+                      .map((sound) => _Chip(sound))
+                      .toList(),
                 ),
-                const SizedBox(height: 28),
-                Text(
-                  _isRecording ? "Listening..." : "Tap to start recording",
-                  style: const TextStyle(color: Colors.white70, fontSize: 14),
-                ),
-                const SizedBox(height: 16),
+
+                const SizedBox(height: 35),
+
                 ElevatedButton.icon(
                   onPressed: _isLoading ? null : _toggleRecording,
                   icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-                  label: Text(_isRecording ? "Stop & Transcribe" : "Start Recording"),
+                  label: Text(
+                    _isRecording ? "Stop Recording" : "Start Recording",
+                  ),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: _isRecording ? const Color(0xFFE5484D) : const Color(0xFFB7E63E),
-                    foregroundColor: const Color(0xFF062211),
-                    padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                    backgroundColor: _isRecording
+                        ? Colors.red
+                        : const Color(0xFFB7E63E),
+                    foregroundColor: Colors.black,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 30,
+                      vertical: 18,
+                    ),
                   ),
                 ),
+
                 const SizedBox(height: 30),
-                if (_isLoading) const CircularProgressIndicator(color: Colors.white),
+
+                if (_isLoading) const CircularProgressIndicator(),
+
                 if (_error != null) _ErrorPanel(message: _error!),
-                if (!_isLoading && _transcript.isNotEmpty)
+
+                if (_transcript.isNotEmpty)
                   Container(
-                    margin: const EdgeInsets.only(top: 10),
                     width: double.infinity,
-                    padding: const EdgeInsets.all(20),
+                    margin: const EdgeInsets.only(top: 20),
+                    padding: const EdgeInsets.all(25),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(20),
                       border: Border.all(color: Colors.white24),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text("Transcript",
-                            style: TextStyle(color: Color(0xFFB7E63E), fontWeight: FontWeight.bold, fontSize: 14)),
-                        const SizedBox(height: 8),
-                        Text(_transcript, style: const TextStyle(color: Colors.white, fontSize: 16)),
-                        const SizedBox(height: 16),
-                        Row(
-                          children: [
-                            Icon(
-                              _urgent ? Icons.warning_amber_rounded : Icons.check_circle,
-                              color: _urgent ? const Color(0xFFE5484D) : const Color(0xFFB7E63E),
-                              size: 18,
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              "Detected sound: $_soundEvent${_urgent ? ' (urgent!)' : ''}",
-                              style: const TextStyle(color: Colors.white70, fontSize: 13),
-                            ),
-                          ],
+                        const Text(
+                          "Transcript",
+                          style: TextStyle(
+                            color: Color(0xFFB7E63E),
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 15),
+
+                        Text(
+                          _transcript,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Text(
+                          "Detected Sound: $_soundEvent",
+                          style: TextStyle(
+                            color: _urgent ? Colors.red : Colors.white70,
+                            fontSize: 16,
+                          ),
                         ),
                       ],
                     ),
@@ -206,37 +267,41 @@ class _HearingPageState extends State<HearingPage> {
 
 class _ErrorPanel extends StatelessWidget {
   final String message;
+
   const _ErrorPanel({required this.message});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 10),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(top: 20),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFE5484D).withOpacity(0.15),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFFE5484D)),
+        color: Colors.red.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(15),
       ),
-      child: Text(message, style: const TextStyle(color: Colors.white)),
+      child: Text(
+        message,
+        style: const TextStyle(color: Colors.white, fontSize: 16),
+      ),
     );
   }
 }
 
 class _Chip extends StatelessWidget {
   final String label;
+
   const _Chip(this.label);
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.08),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white24),
       ),
-      child: Text(label, style: const TextStyle(color: Colors.white70, fontSize: 13)),
+      child: Text(label, style: const TextStyle(color: Colors.white)),
     );
   }
 }

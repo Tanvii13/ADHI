@@ -1,191 +1,196 @@
 import 'package:flutter/material.dart';
-import '../theme.dart';
-import 'navbar.dart';
-import 'footer.dart';
 
-/// Shared page chrome for the Vision / Hearing / Voice assistant pages.
-/// Every mockup uses the same layout: white navbar, dark green page title,
-/// a 3-column dashboard (tools / live output / alerts) that collapses into
-/// a single column on narrow screens, and the white footer.
-class AssistantShell extends StatelessWidget {
-  final String title;
+class AppTopBar extends StatelessWidget {
   final String currentRoute;
-  final Widget leftSidebar;
-  final Widget center;
-  final Widget rightSidebar;
 
-  const AssistantShell({
+  const AppTopBar({
     super.key,
-    required this.title,
     required this.currentRoute,
-    required this.leftSidebar,
-    required this.center,
-    required this.rightSidebar,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            CustomNavbar(currentRoute: currentRoute),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(30, 30, 30, 10),
-              child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-              child: LayoutBuilder(
-                builder: (context, constraints) {
-                  final bool isWide = constraints.maxWidth > 1000;
-                  if (isWide) {
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(width: 280, child: leftSidebar),
-                        const SizedBox(width: 20),
-                        Expanded(child: center),
-                        const SizedBox(width: 20),
-                        SizedBox(width: 280, child: rightSidebar),
-                      ],
-                    );
-                  }
-                  return Column(
-                    children: [
-                      leftSidebar,
-                      const SizedBox(height: 20),
-                      center,
-                      const SizedBox(height: 20),
-                      rightSidebar,
-                    ],
-                  );
-                },
-              ),
-            ),
-            const SizedBox(height: 30),
-            const Footer(),
-          ],
+  Widget navItem(
+      BuildContext context,
+      String title,
+      String route,
+      bool active,
+      ) {
+    return InkWell(
+      onTap: () {
+        Navigator.pushNamed(context, route);
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        child: Text(
+          title,
+          style: TextStyle(
+            color: const Color(0xFF004D26),
+            fontSize: 18,
+            fontWeight:
+            active ? FontWeight.bold : FontWeight.w600,
+          ),
         ),
       ),
     );
   }
-}
-
-/// Rounded green card used for every sidebar block ("Vision Tools",
-/// "Environmental Context", "Alerts & Feedback", etc.)
-class SidebarPanel extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-
-  const SidebarPanel({super.key, required this.title, required this.children});
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 20),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: AppColors.panel,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      height: 80,
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Row(
         children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 18,
+
+          Image.asset(
+            "assets/logo.jpg",
+            width: 45,
+            height: 45,
+          ),
+
+          const SizedBox(width: 12),
+
+          const Text(
+            "ADHI",
+            style: TextStyle(
+              fontSize: 42,
               fontWeight: FontWeight.bold,
+              color: Color(0xFF004D26),
             ),
           ),
-          const SizedBox(height: 14),
-          ...children,
+
+          const Spacer(),
+
+          navItem(
+            context,
+            "Home",
+            "/",
+            currentRoute == "/",
+          ),
+
+          navItem(
+            context,
+            "Hearing Assistant",
+            "/hearing",
+            currentRoute == "/hearing",
+          ),
+
+          navItem(
+            context,
+            "Vision Assistant",
+            "/vision",
+            currentRoute == "/vision",
+          ),
+
+          navItem(
+            context,
+            "Voice Assistant",
+            "/speech",
+            currentRoute == "/speech",
+          ),
+
+          navItem(
+            context,
+            "More",
+            "/",
+            false,
+          ),
+
+          navItem(
+            context,
+            "About",
+            "/about",
+            currentRoute == "/about",
+          ),
         ],
       ),
     );
   }
 }
 
-/// Simple icon + label row, used for static tool/setting lists.
-class ToolRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback? onTap;
-
-  const ToolRow({super.key, required this.icon, required this.label, this.onTap});
+class AppFooter extends StatelessWidget {
+  const AppFooter({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          children: [
-            Icon(icon, color: Colors.white, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                label,
-                style: const TextStyle(color: Colors.white, fontSize: 15),
-              ),
+    return Container(
+      height: 70,
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(horizontal: 30),
+      child: Row(
+        children: [
+
+          const Text(
+            "©2026 ADHI",
+            style: TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF004D26),
             ),
-          ],
-        ),
+          ),
+
+          const Spacer(),
+
+          RichText(
+            text: const TextSpan(
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+              children: [
+                TextSpan(
+                  text: "Made with ",
+                  style: TextStyle(
+                    color: Color(0xFF004D26),
+                  ),
+                ),
+                TextSpan(
+                  text: "❤️",
+                ),
+                TextSpan(
+                  text: " by Tanvi",
+                  style: TextStyle(
+                    color: Color(0xFF004D26),
+                  ),
+                ),
+              ],
+            ),
+          )
+        ],
       ),
     );
   }
 }
 
-/// Icon + label + Switch row, used for the on/off preference toggles.
-class ToggleItem extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final bool value;
-  final ValueChanged<bool>? onChanged;
+class AppPageShell extends StatelessWidget {
+  final String currentRoute;
+  final Widget body;
 
-  const ToggleItem({
+  const AppPageShell({
     super.key,
-    required this.icon,
-    required this.label,
-    required this.value,
-    this.onChanged,
+    required this.currentRoute,
+    required this.body,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
+    return Scaffold(
+      backgroundColor: const Color(0xFF004D26),
+
+      body: Column(
         children: [
-          Icon(icon, color: Colors.white, size: 20),
-          const SizedBox(width: 10),
+
+          AppTopBar(
+            currentRoute: currentRoute,
+          ),
+
           Expanded(
-            child: Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontSize: 14),
+            child: SingleChildScrollView(
+              child: body,
             ),
           ),
-          Switch(
-            value: value,
-            onChanged: onChanged,
-            activeColor: AppColors.accentLime,
-          ),
+
+          const AppFooter(),
         ],
       ),
     );
