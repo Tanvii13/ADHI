@@ -66,5 +66,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>ADHI needs microphone access so the Hearing Assistant can transcribe speech and detect urgent sounds.</string>
 </dict>
 </plist>
