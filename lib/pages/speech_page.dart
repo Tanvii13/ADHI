@@ -188,8 +188,14 @@ class _QuickPhraseChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Important: Material's own `color` paints as fully opaque on some
+    // Flutter web renderers even with .withOpacity(), which is why these
+    // were showing up as solid white pills. Keeping Material fully
+    // transparent and putting the translucent color on the Container's
+    // BoxDecoration instead (same pattern as the Hearing Assistant chips)
+    // gives the correct glass effect.
     return Material(
-      color: Colors.white.withOpacity(0.08),
+      type: MaterialType.transparency,
       borderRadius: BorderRadius.circular(24),
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
@@ -197,6 +203,7 @@ class _QuickPhraseChip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
           decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.08),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(color: Colors.white24),
           ),
