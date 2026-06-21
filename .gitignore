@@ -5,7 +5,6 @@
 *.swp
 .DS_Store
 .atom/
-.build/
 .buildlog/
 .history
 .svn/
@@ -49,3 +48,5 @@ test_gemini.py
 test_models.py
 image_test.py
 test.jpg
+.vercel
+.env*
