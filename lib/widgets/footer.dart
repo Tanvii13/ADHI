@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme.dart';
 
 class Footer extends StatelessWidget {
   const Footer({super.key});
@@ -7,34 +8,29 @@ class Footer extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        vertical: 40,
-        horizontal: 30,
-      ),
-      color: const Color(0xFF08120E),
-      child: const Column(
+      color: Colors.white,
+      padding: const EdgeInsets.symmetric(vertical: 22, horizontal: 40),
+      child: Wrap(
+        alignment: WrapAlignment.spaceBetween,
+        runSpacing: 8,
         children: [
-          Text(
-            "ADHI",
-            style: TextStyle(
-              color: Colors.greenAccent,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
+          const Text(
+            "ADHI copyright 2026",
+            style: TextStyle(color: AppColors.background, fontWeight: FontWeight.bold),
           ),
-          SizedBox(height: 12),
-          Text(
-            "AI-Powered Accessibility Platform",
-            style: TextStyle(
-              color: Colors.white70,
-            ),
-          ),
-          SizedBox(height: 20),
-          Text(
-            "Inspired by Anita & Dhiren • Accessibility for Everyone",
-            style: TextStyle(
-              color: Colors.white54,
-            ),
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: const [
+              Text(
+                "Made with ",
+                style: TextStyle(color: AppColors.background, fontWeight: FontWeight.bold),
+              ),
+              Text("❤️", style: TextStyle(fontSize: 14)),
+              Text(
+                " by Tanvi",
+                style: TextStyle(color: AppColors.background, fontWeight: FontWeight.bold),
+              ),
+            ],
           ),
         ],
       ),

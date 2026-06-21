@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../theme.dart';
 
 class FeatureCard extends StatelessWidget {
   final IconData icon;
@@ -23,22 +24,17 @@ class FeatureCard extends StatelessWidget {
         width: 320,
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppColors.panel,
           borderRadius: BorderRadius.circular(20),
-          boxShadow: const [
-            BoxShadow(
-              blurRadius: 10,
-              color: Colors.black12,
-            ),
-          ],
         ),
         child: Column(
           children: [
-            Icon(icon, size: 60),
+            Icon(icon, size: 56, color: AppColors.accentLime),
             const SizedBox(height: 15),
             Text(
               title,
               style: const TextStyle(
+                color: Colors.white,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -47,6 +43,7 @@ class FeatureCard extends StatelessWidget {
             Text(
               description,
               textAlign: TextAlign.center,
+              style: const TextStyle(color: Colors.white70),
             ),
           ],
         ),
