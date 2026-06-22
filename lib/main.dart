@@ -19,7 +19,9 @@ class AdhiApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'ADHI Accessibility Platform',
-      theme: ThemeData(scaffoldBackgroundColor: const Color(0xFF004D1A)),
+      theme: ThemeData(
+        scaffoldBackgroundColor: const Color(0xFF004D1A),
+      ),
       routes: {
         '/': (context) => const AdhiHomePage(),
         '/vision': (context) => const VisionPage(),
@@ -38,33 +40,39 @@ class AdhiHomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return AppPageShell(
       currentRoute: '/',
-      body: Column(
-        children: [
-          const SizedBox(height: 40),
+      body: SizedBox(
+        height: MediaQuery.of(context).size.height,
+        width: MediaQuery.of(context).size.width,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
 
-          const Text(
-            "Accessibility is not a privilege; it is a right.",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 56,
-              fontWeight: FontWeight.bold,
+            // TITLE
+            const Text(
+              "Accessibility is not a privilege;\nit is a right.",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 56,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
 
-          const SizedBox(height: 40),
+            const SizedBox(height: 40),
 
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: LayoutBuilder(
+            // CARDS ROW
+            LayoutBuilder(
               builder: (context, constraints) {
+
                 final cards = [
-                  _GlassFeatureCard(
+
+                   _GlassFeatureCard(
                     imagePath: 'assets/deaf.png',
                     description:
                         'Giving ears to 70 million people by translating spoken words into live screen text.',
                     onTap: () => Navigator.pushNamed(context, '/hearing'),
                   ),
+
                   _GlassFeatureCard(
                     imagePath: 'assets/blind.png',
                     description:
@@ -72,7 +80,7 @@ class AdhiHomePage extends StatelessWidget {
                     onTap: () => Navigator.pushNamed(context, '/vision'),
                   ),
 
-                  
+                 
 
                   _GlassFeatureCard(
                     imagePath: 'assets/mute.png',
@@ -84,7 +92,7 @@ class AdhiHomePage extends StatelessWidget {
 
                 if (constraints.maxWidth > 1000) {
                   return Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Expanded(child: cards[0]),
                       const SizedBox(width: 18),
@@ -96,6 +104,7 @@ class AdhiHomePage extends StatelessWidget {
                 }
 
                 return Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     cards[0],
                     const SizedBox(height: 20),
@@ -106,21 +115,19 @@ class AdhiHomePage extends StatelessWidget {
                 );
               },
             ),
-          ),
 
-          const SizedBox(height: 50),
+            const SizedBox(height: 40),
 
-          const Text(
-            "The World Adapts To You",
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 34,
-              fontWeight: FontWeight.bold,
+            const Text(
+              "The World Adapts To You",
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 28,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-          ),
-
-          const SizedBox(height: 80),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -142,48 +149,52 @@ class _GlassFeatureCard extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(22),
-      hoverColor: Colors.transparent,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // --- Image ---
+
+          // IMAGE
           ClipRRect(
             borderRadius: BorderRadius.circular(20),
             child: SizedBox(
-              height: 280,
-              width: double.infinity,
-              child: Image.asset(imagePath, fit: BoxFit.cover),
+              height: 260,
+              child: Image.asset(
+                imagePath,
+                fit: BoxFit.cover,
+              ),
             ),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 18),
 
-          // --- Floating glass caption card ---
+          // GLASS DESCRIPTION
           ClipRRect(
             borderRadius: BorderRadius.circular(18),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                  vertical: 26,
-                  horizontal: 22,
+                  vertical: 22,
+                  horizontal: 18,
                 ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: Colors.white.withOpacity(0.16)),
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.15),
+                  ),
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                     colors: [
-                      Colors.white.withOpacity(0.14),
-                      Colors.white.withOpacity(0.04),
+                      Colors.white.withOpacity(0.12),
+                      Colors.white.withOpacity(0.03),
                     ],
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.35),
-                      blurRadius: 22,
-                      offset: const Offset(0, 14),
+                      color: Colors.black.withOpacity(0.3),
+                      blurRadius: 18,
+                      offset: const Offset(0, 10),
                     ),
                   ],
                 ),
@@ -192,9 +203,9 @@ class _GlassFeatureCard extends StatelessWidget {
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     color: Colors.white,
-                    fontSize: 17,
-                    height: 1.55,
-                    fontWeight: FontWeight.w700,
+                    fontSize: 16,
+                    height: 1.5,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
