@@ -8,6 +8,11 @@ import 'package:adhi/main.dart';
 
 void main() {
   testWidgets('ADHI home page renders title and feature cards', (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(2000, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(const AdhiApp());
     await tester.pumpAndSettle();
 
@@ -18,6 +23,11 @@ void main() {
 
   testWidgets('Tapping Vision Assistant nav link navigates to Vision page',
       (WidgetTester tester) async {
+    tester.view.physicalSize = const Size(2000, 800);
+    tester.view.devicePixelRatio = 1.0;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
     await tester.pumpWidget(const AdhiApp());
     await tester.pumpAndSettle();
 

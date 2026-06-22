@@ -132,20 +132,21 @@ class _HearingPageState extends State<HearingPage> {
     });
 
     try {
-      if (kIsWeb) {
-        setState(() {
-          _error =
-              "Audio upload from browser is limited. Test Hearing Assistant on Android/Desktop.";
-        });
-        return;
-      }
-
       final response = await _sendWithRetry(() async {
         final request = http.MultipartRequest(
           "POST",
           Uri.parse("$_apiBase/transcribe"),
         );
-        request.files.add(await http.MultipartFile.fromPath("file", path));
+        if (kIsWeb) {
+          final blobResponse = await http.get(Uri.parse(path));
+          request.files.add(http.MultipartFile.fromBytes(
+            "file",
+            blobResponse.bodyBytes,
+            filename: "recording.wav",
+          ));
+        } else {
+          request.files.add(await http.MultipartFile.fromPath("file", path));
+        }
         return request;
       });
 
