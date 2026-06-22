@@ -1,7 +1,7 @@
 # ADHI — AI for Disability, Human Inclusion & Independence
 
-[![Platform](https://img.shields.io/badge/Platform-Flutter%20Cross--Platform-blue.svg)]()
-[![Backend](https://img.shields.io/badge/Backend-FastAPI%20+%20Gemini-orange.svg)]()
+[![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/Tanvii13/ADHI)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase%20Hosting-blue?logo=firebase)](https://adhi-400e8.web.app/)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)]()
 
 > *"Accessibility is not a privilege; it is a right."*
