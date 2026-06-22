@@ -60,17 +60,17 @@ class AdhiHomePage extends StatelessWidget {
               builder: (context, constraints) {
                 final cards = [
                   _GlassFeatureCard(
-                    imagePath: 'assets/blind.png',
-                    description:
-                        'Giving eyes to 1 billion people by turning camera views into spoken descriptions.',
-                    onTap: () => Navigator.pushNamed(context, '/vision'),
-                  ),
-
-                  _GlassFeatureCard(
                     imagePath: 'assets/deaf.png',
                     description:
                         'Giving ears to 70 million people by translating spoken words into live screen text.',
                     onTap: () => Navigator.pushNamed(context, '/hearing'),
+                  ),
+
+                  _GlassFeatureCard(
+                    imagePath: 'assets/blind.png',
+                    description:
+                        'Giving eyes to 1 billion people by turning camera views into spoken descriptions.',
+                    onTap: () => Navigator.pushNamed(context, '/vision'),
                   ),
 
                   _GlassFeatureCard(
@@ -163,7 +163,10 @@ class _GlassFeatureCard extends StatelessWidget {
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 26, horizontal: 22),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 26,
+                  horizontal: 22,
+                ),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
                   border: Border.all(color: Colors.white.withOpacity(0.16)),
