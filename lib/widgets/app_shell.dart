@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'navbar.dart';
+import 'footer.dart';
 
 class AppTopBar extends StatelessWidget {
   final String currentRoute;
@@ -295,11 +297,19 @@ class AppPageShell extends StatelessWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF014421),
       endDrawer: AppDrawer(currentRoute: currentRoute),
+
       body: Column(
         children: [
-          navBar,
-          Expanded(child: body),
-          footer,
+          const AppTopBar(currentRoute: '/'),
+
+          Expanded(
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: body,
+            ),
+          ),
+
+          const AppFooter(),
         ],
       ),
     );
