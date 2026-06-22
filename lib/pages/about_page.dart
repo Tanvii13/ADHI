@@ -22,14 +22,16 @@ class AboutPage extends StatelessWidget {
                   "ADHI",
                   style: TextStyle(
                     color: AppColors.accentLime,
-                    fontSize: 20,
+                    fontSize: 40,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 4,
                   ),
                 ),
+
                 const SizedBox(height: 16),
+
                 const Text(
-                  "AI for Independence,\nInclusion & Sight",
+                  "AI for Disability, Human Inclusion & Independence",
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
@@ -39,7 +41,9 @@ class AboutPage extends StatelessWidget {
                     letterSpacing: -0.5,
                   ),
                 ),
+
                 const SizedBox(height: 24),
+
                 Text(
                   "ADHI is an accessibility platform that gives sight, hearing\n"
                   "and a voice back to the people who need it most — built on\n"
@@ -52,11 +56,27 @@ class AboutPage extends StatelessWidget {
                   ),
                 ),
 
+                const SizedBox(height: 16),
+
+                Text(
+                  "ADHI is inspired by the names of my parents, Anita and Dhiren, "
+                  "symbolizing care, support, and inclusivity. These values drive "
+                  "our mission to empower people with visual, hearing, and speech "
+                  "impairments through AI.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.7),
+                    fontSize: 16,
+                    height: 1.6,
+                  ),
+                ),
+
                 const SizedBox(height: 56),
 
                 // Three pillar cards
                 LayoutBuilder(builder: (context, constraints) {
                   final isWide = constraints.maxWidth > 760;
+
                   final cards = [
                     _PillarCard(
                       icon: Icons.remove_red_eye_rounded,
@@ -87,13 +107,15 @@ class AboutPage extends StatelessWidget {
                       children: cards
                           .map((c) => Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 10),
                                   child: c,
                                 ),
                               ))
                           .toList(),
                     );
                   }
+
                   return Column(
                     children: cards
                         .map((c) => Padding(
@@ -108,7 +130,8 @@ class AboutPage extends StatelessWidget {
 
                 // Mission statement banner
                 GlassPanel(
-                  padding: const EdgeInsets.symmetric(vertical: 44, horizontal: 36),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 44, horizontal: 36),
                   child: Column(
                     children: [
                       Icon(Icons.shield_moon_rounded,
@@ -139,7 +162,6 @@ class AboutPage extends StatelessWidget {
 
                 const SizedBox(height: 56),
 
-                // How it works strip
                 const Text(
                   "How ADHI Works",
                   style: TextStyle(
@@ -148,9 +170,12 @@ class AboutPage extends StatelessWidget {
                     fontWeight: FontWeight.w800,
                   ),
                 ),
+
                 const SizedBox(height: 28),
+
                 LayoutBuilder(builder: (context, constraints) {
                   final isWide = constraints.maxWidth > 760;
+
                   final steps = [
                     _StepCard(
                       number: "01",
@@ -171,18 +196,21 @@ class AboutPage extends StatelessWidget {
                           "ADHI speaks, displays, or alerts — translating one sense into another, instantly.",
                     ),
                   ];
+
                   if (isWide) {
                     return Row(
                       children: steps
                           .map((s) => Expanded(
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 10),
                                   child: s,
                                 ),
                               ))
                           .toList(),
                     );
                   }
+
                   return Column(
                     children: steps
                         .map((s) => Padding(
@@ -202,6 +230,8 @@ class AboutPage extends StatelessWidget {
     );
   }
 }
+
+/* ---------------- PILLAR CARD ---------------- */
 
 class _PillarCard extends StatelessWidget {
   final IconData icon;
@@ -263,6 +293,8 @@ class _PillarCard extends StatelessWidget {
     );
   }
 }
+
+/* ---------------- STEP CARD ---------------- */
 
 class _StepCard extends StatelessWidget {
   final String number;

@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import '../theme.dart';
-
-/// A reusable frosted-glass panel used across Hearing / Voice / About
-/// pages so every "result" / "input" surface feels consistent and premium.
 class GlassPanel extends StatelessWidget {
   final Widget child;
   final EdgeInsetsGeometry padding;
@@ -52,7 +49,6 @@ class GlassPanel extends StatelessWidget {
   }
 }
 
-/// Lime gradient pill button used for primary actions (Speak / Start etc).
 class PremiumButton extends StatelessWidget {
   final String label;
   final IconData icon;
@@ -138,9 +134,6 @@ class PremiumButton extends StatelessWidget {
   }
 }
 
-/// Large circular mic/record button with an animated pulsing ring while
-/// recording, so it reads as a premium control rather than a flat
-/// ElevatedButton.
 class PulsingRecordButton extends StatefulWidget {
   final bool isRecording;
   final bool isLoading;
@@ -250,9 +243,6 @@ class _PulsingRecordButtonState extends State<PulsingRecordButton>
   }
 }
 
-/// Glassmorphic text field wrapper so every text input across the app
-/// (Voice Assistant, etc.) shares the same frosted look instead of a
-/// plain white Material textbox.
 class GlassTextField extends StatelessWidget {
   final TextEditingController controller;
   final String hintText;
@@ -303,8 +293,6 @@ class GlassTextField extends StatelessWidget {
   }
 }
 
-/// Section heading style reused across assistant pages — bigger, bolder,
-/// with a small lime accent bar to feel like a real product page.
 class SectionHeader extends StatelessWidget {
   final String title;
   final String subtitle;

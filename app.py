@@ -8,11 +8,6 @@ import tempfile
 
 app = FastAPI(title="ADHI API")
 
-# --- CORS ---------------------------------------------------------------
-# Your Flutter web build (Vercel) and your FastAPI backend (Render) live on
-# different origins, so the browser blocks fetch calls unless the API sends
-# CORS headers back. allow_origins=["*"] gets you unblocked for the demo;
-# before final submission, swap "*" for your actual Vercel URL.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

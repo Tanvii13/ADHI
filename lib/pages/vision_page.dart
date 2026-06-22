@@ -6,10 +6,6 @@ import 'package:http/http.dart' as http;
 
 import '../widgets/app_shell.dart';
 
-/// Vision Assistant: upload a photo, get back a spoken-style description
-/// plus the full structured breakdown the backend already provides —
-/// notable objects, hazards/safety risks, and any text detected in the
-/// image (signage, labels, etc.).
 class VisionPage extends StatefulWidget {
   const VisionPage({super.key});
 
@@ -20,10 +16,6 @@ class VisionPage extends StatefulWidget {
 class _VisionPageState extends State<VisionPage> {
   static const String _apiBase = "https://adhi-api.onrender.com";
 
-  // Render's free tier spins the service down after ~15 min idle. The
-  // first request after that can fail or hang while it cold-starts, so
-  // we retry a few times with backoff instead of showing a scary error
-  // on the very first attempt.
   static const List<Duration> _retryDelays = [
     Duration(seconds: 4),
     Duration(seconds: 8),
@@ -82,7 +74,7 @@ class _VisionPageState extends State<VisionPage> {
     final request = http.MultipartRequest("POST", Uri.parse("$_apiBase/describe"));
 
     if (selectedFile!.bytes != null) {
-      // Web: no real file path, use in-memory bytes instead.
+      
       request.files.add(http.MultipartFile.fromBytes(
         "file",
         selectedFile!.bytes!,

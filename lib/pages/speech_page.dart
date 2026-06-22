@@ -4,9 +4,6 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../theme.dart';
 import '../widgets/app_shell.dart';
 import '../widgets/glass.dart';
-
-/// Voice Assistant: converts typed phrases into digital speech entirely
-/// on-device via flutter_tts (no backend round-trip needed).
 class SpeechPage extends StatefulWidget {
   const SpeechPage({super.key});
 
@@ -188,12 +185,7 @@ class _QuickPhraseChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Important: Material's own `color` paints as fully opaque on some
-    // Flutter web renderers even with .withOpacity(), which is why these
-    // were showing up as solid white pills. Keeping Material fully
-    // transparent and putting the translucent color on the Container's
-    // BoxDecoration instead (same pattern as the Hearing Assistant chips)
-    // gives the correct glass effect.
+  
     return Material(
       type: MaterialType.transparency,
       borderRadius: BorderRadius.circular(24),
