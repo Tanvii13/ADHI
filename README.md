@@ -2,7 +2,7 @@
 
 [![GitHub Repository](https://img.shields.io/badge/GitHub-Repository-black?logo=github)](https://github.com/Tanvii13/ADHI)
 [![Live Demo](https://img.shields.io/badge/Live%20Demo-Firebase%20Hosting-blue?logo=firebase)](https://adhi-400e8.web.app/)
-[![License](https://img.shields.io/badge/License-MIT-green.svg)]()
+[![License](license.txt)]()
 
 > *"Accessibility is not a privilege; it is a right."*
 
