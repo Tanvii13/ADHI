@@ -301,11 +301,19 @@ class AppPageShell extends StatelessWidget {
       body: Column(
         children: [
           const AppTopBar(currentRoute: '/'),
-
           Expanded(
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              child: body,
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
+                    ),
+                    child: body,
+                  ),
+                );
+              },
             ),
           ),
 
