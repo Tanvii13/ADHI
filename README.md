@@ -10,7 +10,7 @@ ADHI is an intelligent, multimodal AI accessibility platform engineered to conso
 
 ---
 
-## 📖 Table of Contents
+## Table of Contents
 1. [Core Modules & Features](#-core-modules--features)
 2. [Tech Stack & Architecture](#-tech-stack--architecture)
 3. [Repository File Structure](#-repository-file-tree)
@@ -19,24 +19,24 @@ ADHI is an intelligent, multimodal AI accessibility platform engineered to conso
 
 ---
 
-## 🌟 Core Modules & Features
+##  Core Modules & Features
 
-### 👁️ Vision Assistant (Visual Mapping & Reading)
+###  Vision Assistant (Visual Mapping & Reading)
 * **Contextual Scene Description:** Ingests live environmental viewpoints or captured frames through high-level vision reasoning APIs to return real-time descriptive textual and spoken analysis[cite: 1].
 * **Spatial Object Detection:** Maps surrounding physical objects onto localized coordinates to pinpoint obstacle placements and increase indoor navigation safety[cite: 1].
 * **Scene OCR Document Reader:** Leverages optical character text extraction pipelines to parse real-world signage, grocery labels, printed text, and documents immediately[cite: 1].
 
-### 👂 Hearing Assistant (Auditory Translation & Alerts)
+###  Hearing Assistant (Auditory Translation & Alerts)
 * **Live Environmental Captioning:** Pipelines raw spoken microphone stream buffers directly into low-latency automatic speech transcription processors to write real-time legible text[cite: 1].
 * **Ambient Hazard Fingerprinting:** Actively filters the local sound stage to catch, flag, and alert users to critical safety trigger noises like Sirens, Smoke Alarms, Shouting, Knocking, and Doorbells[cite: 1].
 
-### 🗣️ Voice Assistant (Vocal Synthesis Engine)
+###  Voice Assistant (Vocal Synthesis Engine)
 * **Custom Text-to-Speech Hub:** Translates user-typed text arrays into high-fidelity synthetic voice playback with scalable tone adjustments[cite: 1].
 * **Tactile Phrase Macro Grid:** Offers a high-visibility panel populated with immediate touch-and-speak macro cards for vital everyday messages like *"Yes"*, *"No"*, *"Thank you"*, and *"I need help"*[cite: 1].
 
 ---
 
-## 🏗️ Tech Stack & Architecture
+##  Tech Stack & Architecture
 
 * **Frontend Client:** Flutter SDK (Dart) deploying cross-platform targets optimized for deep font-scaling, text-readers, and high-readability color contrast[cite: 1].
 * **Backend Framework:** Async FastAPI (Python) web gateway operating as the high-throughput gateway router[cite: 1].
