@@ -29,14 +29,10 @@ class _HearingPageState extends State<HearingPage> {
     "Doorbell",
   ];
 
-  // Render's free tier spins the service down after ~15 min idle. The
-  // first request after that can fail or hang while it cold-starts, so
-  // we retry a few times with backoff instead of showing a scary error
-  // on the very first attempt.
   static const List<Duration> _retryDelays = [
-    Duration(seconds: 4),
-    Duration(seconds: 8),
-    Duration(seconds: 12),
+    Duration(seconds: 3),
+    Duration(seconds: 6),
+    Duration(seconds: 10),
   ];
 
   final AudioRecorder _recorder = AudioRecorder();
@@ -60,9 +56,7 @@ class _HearingPageState extends State<HearingPage> {
     if (_isRecording) {
       final path = await _recorder.stop();
 
-      setState(() {
-        _isRecording = false;
-      });
+      setState(() => _isRecording = false);
 
       if (path != null) {
         await _uploadAudio(path);
@@ -74,9 +68,7 @@ class _HearingPageState extends State<HearingPage> {
     final hasPermission = await _recorder.hasPermission();
 
     if (!hasPermission) {
-      setState(() {
-        _error = "Microphone permission denied";
-      });
+      setState(() => _error = "Microphone permission denied");
       return;
     }
 
@@ -99,29 +91,15 @@ class _HearingPageState extends State<HearingPage> {
     });
   }
 
-  Future<http.StreamedResponse> _sendWithRetry(
-    Future<http.MultipartRequest> Function() buildRequest,
+  Future<http.StreamedResponse> _sendRequestWithTimeout(
+    http.MultipartRequest request,
   ) async {
-    Object? lastError;
-
-    for (var attempt = 0; attempt <= _retryDelays.length; attempt++) {
-      try {
-        final request = await buildRequest();
-        return await request.send();
-      } catch (e) {
-        lastError = e;
-
-        if (attempt < _retryDelays.length) {
-          setState(() {
-            _statusMessage =
-                "The assistant is waking up (this can take a little while on the first request)…";
-          });
-          await Future.delayed(_retryDelays[attempt]);
-        }
-      }
-    }
-
-    throw lastError ?? Exception("Unknown error contacting the assistant");
+    return await request.send().timeout(
+      const Duration(seconds: 20),
+      onTimeout: () {
+        throw Exception("Request timeout - backend not responding");
+      },
+    );
   }
 
   Future<void> _uploadAudio(String path) async {
@@ -132,27 +110,30 @@ class _HearingPageState extends State<HearingPage> {
     });
 
     try {
-      final response = await _sendWithRetry(() async {
-        final request = http.MultipartRequest(
-          "POST",
-          Uri.parse("$_apiBase/transcribe"),
-        );
-        if (kIsWeb) {
-          final blobResponse = await http.get(Uri.parse(path));
-          request.files.add(http.MultipartFile.fromBytes(
+      final request = http.MultipartRequest(
+        "POST",
+        Uri.parse("$_apiBase/transcribe"),
+      );
+
+      if (kIsWeb) {
+        final blobResponse = await http.get(Uri.parse(path));
+        request.files.add(
+          http.MultipartFile.fromBytes(
             "file",
             blobResponse.bodyBytes,
             filename: "recording.wav",
-          ));
-        } else {
-          request.files.add(await http.MultipartFile.fromPath("file", path));
-        }
-        return request;
-      });
+          ),
+        );
+      } else {
+        request.files.add(await http.MultipartFile.fromPath("file", path));
+      }
 
+      final response = await _sendRequestWithTimeout(request);
       final body = await response.stream.bytesToString();
 
       final data = jsonDecode(body);
+
+      if (!mounted) return;
 
       setState(() {
         _transcript = data["transcript"] ?? "";
@@ -160,11 +141,14 @@ class _HearingPageState extends State<HearingPage> {
         _urgent = data["urgent"] ?? false;
       });
     } catch (e) {
+      if (!mounted) return;
+
       setState(() {
-        _error =
-            "Could not reach the hearing assistant after several attempts. It may be waking up from sleep — please try again in a moment.\n($e)";
+        _error = "Hearing assistant failed. Please try again.\n$e";
       });
     } finally {
+      if (!mounted) return;
+
       setState(() {
         _isLoading = false;
         _statusMessage = null;
@@ -172,7 +156,6 @@ class _HearingPageState extends State<HearingPage> {
 
       if (!kIsWeb) {
         final file = File(path);
-
         if (await file.exists()) {
           await file.delete();
         }
@@ -194,7 +177,7 @@ class _HearingPageState extends State<HearingPage> {
                 SectionHeader(
                   title: "Hearing Assistant",
                   subtitle:
-                      "Record speech and ambient sound — ADHI turns it into\nreadable text and flags urgent alerts instantly.",
+                      "Record speech and ambient sound — ADHI converts it into text.",
                   icon: Icons.hearing_rounded,
                   iconColor: _urgent
                       ? const Color(0xFFE5484D)
@@ -204,12 +187,9 @@ class _HearingPageState extends State<HearingPage> {
                 const SizedBox(height: 36),
 
                 Wrap(
-                  alignment: WrapAlignment.center,
                   spacing: 12,
                   runSpacing: 12,
-                  children: _watchedSounds
-                      .map((sound) => _Chip(sound))
-                      .toList(),
+                  children: _watchedSounds.map((e) => _Chip(e)).toList(),
                 ),
 
                 const SizedBox(height: 48),
@@ -224,139 +204,57 @@ class _HearingPageState extends State<HearingPage> {
 
                 Text(
                   _isLoading
-                      ? "Processing audio…"
+                      ? "Processing audio..."
                       : _isRecording
-                          ? "Listening… tap to stop"
-                          : "Tap to start recording",
+                      ? "Listening... tap to stop"
+                      : "Tap to start recording",
                   style: TextStyle(
                     color: Colors.white.withOpacity(0.75),
-                    fontSize: 17,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 16,
                   ),
                 ),
 
-                if (_statusMessage != null) ...[
-                  const SizedBox(height: 10),
-                  Text(
-                    _statusMessage!,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.6),
-                      fontSize: 14,
+                if (_error != null) ...[
+                  const SizedBox(height: 20),
+                  GlassPanel(
+                    borderColor: Colors.redAccent,
+                    child: Text(
+                      _error!,
+                      style: const TextStyle(color: Colors.white),
                     ),
                   ),
                 ],
 
-                const SizedBox(height: 36),
-
-                if (_error != null) _ErrorPanel(message: _error!),
-
-                if (_transcript.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 8),
-                    child: GlassPanel(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Icon(Icons.subtitles_rounded,
-                                  color: AppColors.accentLime, size: 26),
-                              const SizedBox(width: 10),
-                              const Text(
-                                "Transcript",
-                                style: TextStyle(
-                                  color: AppColors.accentLime,
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                            ],
+                if (_transcript.isNotEmpty) ...[
+                  const SizedBox(height: 30),
+                  GlassPanel(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Transcript",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
                           ),
-                          const SizedBox(height: 18),
-                          Text(
-                            _transcript,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              height: 1.5,
-                            ),
+                        ),
+                        const SizedBox(height: 12),
+                        Text(
+                          _transcript,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
                           ),
-                          const SizedBox(height: 24),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: _urgent
-                                  ? const Color(0xFFE5484D).withOpacity(0.18)
-                                  : Colors.white.withOpacity(0.08),
-                              borderRadius: BorderRadius.circular(14),
-                              border: Border.all(
-                                color: _urgent
-                                    ? const Color(0xFFE5484D)
-                                    : Colors.white24,
-                              ),
-                            ),
-                            child: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Icon(
-                                  _urgent
-                                      ? Icons.warning_amber_rounded
-                                      : Icons.graphic_eq_rounded,
-                                  size: 20,
-                                  color: _urgent
-                                      ? const Color(0xFFE5484D)
-                                      : Colors.white70,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  "Detected Sound: $_soundEvent",
-                                  style: TextStyle(
-                                    color: _urgent
-                                        ? const Color(0xFFE5484D)
-                                        : Colors.white70,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
+                ],
               ],
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-class _ErrorPanel extends StatelessWidget {
-  final String message;
-
-  const _ErrorPanel({required this.message});
-
-  @override
-  Widget build(BuildContext context) {
-    return GlassPanel(
-      borderColor: const Color(0xFFE5484D).withOpacity(0.5),
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        children: [
-          const Icon(Icons.error_outline_rounded, color: Color(0xFFE5484D)),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.white, fontSize: 16),
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -370,20 +268,13 @@ class _Chip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
         color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(20),
         border: Border.all(color: Colors.white24),
       ),
-      child: Text(
-        label,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
+      child: Text(label, style: const TextStyle(color: Colors.white)),
     );
   }
 }

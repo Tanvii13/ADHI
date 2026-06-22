@@ -70,7 +70,11 @@ class AppTopBar extends StatelessWidget {
             Builder(
               builder: (context) {
                 return IconButton(
-                  icon: const Icon(Icons.menu, color: Color(0xFF014421), size: 32),
+                  icon: const Icon(
+                    Icons.menu,
+                    color: Color(0xFF014421),
+                    size: 32,
+                  ),
                   onPressed: () {
                     Scaffold.of(context).openEndDrawer();
                   },
@@ -151,9 +155,24 @@ class AppDrawer extends StatelessWidget {
             const Divider(color: Colors.white24, height: 1),
             const SizedBox(height: 20),
             _drawerTile(context, 'Home', '/', Icons.home_rounded),
-            _drawerTile(context, 'Hearing Assistant', '/hearing', Icons.hearing_rounded),
-            _drawerTile(context, 'Vision Assistant', '/vision', Icons.visibility_rounded),
-            _drawerTile(context, 'Voice Assistant', '/speech', Icons.record_voice_over_rounded),
+            _drawerTile(
+              context,
+              'Hearing Assistant',
+              '/hearing',
+              Icons.hearing_rounded,
+            ),
+            _drawerTile(
+              context,
+              'Vision Assistant',
+              '/vision',
+              Icons.visibility_rounded,
+            ),
+            _drawerTile(
+              context,
+              'Voice Assistant',
+              '/speech',
+              Icons.record_voice_over_rounded,
+            ),
             _drawerTile(context, 'About', '/about', Icons.info_rounded),
             const Spacer(),
             const Padding(
@@ -194,7 +213,9 @@ class AppDrawer extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: selected ? Colors.white.withOpacity(0.12) : Colors.transparent,
+            color: selected
+                ? Colors.white.withOpacity(0.12)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: selected ? Colors.white24 : Colors.transparent,
@@ -276,11 +297,9 @@ class AppPageShell extends StatelessWidget {
       endDrawer: AppDrawer(currentRoute: currentRoute),
       body: Column(
         children: [
-          AppTopBar(currentRoute: currentRoute),
-
-          Expanded(child: SingleChildScrollView(child: body)),
-
-          const AppFooter(),
+          navBar,
+          Expanded(child: body),
+          footer,
         ],
       ),
     );
