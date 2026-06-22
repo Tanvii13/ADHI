@@ -54,41 +54,6 @@ class HomePage extends StatelessWidget {
     );
   }
 
-  Widget glassCard(String title, String description) {
-    return Container(
-      width: 320,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(25),
-        border: Border.all(
-          color: Colors.white24,
-        ),
-      ),
-      child: Column(
-        children: [
-          Text(
-            title,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 22,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 12),
-          Text(
-            description,
-            textAlign: TextAlign.center,
-            style: const TextStyle(
-              color: Colors.white70,
-              height: 1.6,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -138,15 +103,15 @@ class HomePage extends StatelessWidget {
               children: [
                 featureImage(
                   context: context,
-                  imagePath: "assets/hearing.jpg",
-                  title: "Hearing Assistant",
-                  route: "/hearing",
-                ),
-                featureImage(
-                  context: context,
                   imagePath: "assets/vision.jpg",
                   title: "Vision Assistant",
                   route: "/vision",
+                ),
+                featureImage(
+                  context: context,
+                  imagePath: "assets/hearing.jpg",
+                  title: "Hearing Assistant",
+                  route: "/hearing",
                 ),
                 featureImage(
                   context: context,
@@ -158,28 +123,6 @@ class HomePage extends StatelessWidget {
             ),
 
             const SizedBox(height: 80),
-
-            Wrap(
-              spacing: 25,
-              runSpacing: 25,
-              alignment: WrapAlignment.center,
-              children: [
-                glassCard(
-                  "Hear",
-                  "Convert speech into readable text instantly.",
-                ),
-                glassCard(
-                  "See",
-                  "Understand surroundings through image analysis.",
-                ),
-                glassCard(
-                  "Speak",
-                  "Convert text into natural sounding speech.",
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 100),
 
             const Text(
               "The World Adapts To You",

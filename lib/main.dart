@@ -65,13 +65,14 @@ class AdhiHomePage extends StatelessWidget {
                         'Giving ears to 70 million people by translating spoken words into live screen text.',
                     onTap: () => Navigator.pushNamed(context, '/hearing'),
                   ),
-
                   _GlassFeatureCard(
                     imagePath: 'assets/blind.png',
                     description:
                         'Giving eyes to 1 billion people by turning camera views into spoken descriptions.',
                     onTap: () => Navigator.pushNamed(context, '/vision'),
                   ),
+
+                  
 
                   _GlassFeatureCard(
                     imagePath: 'assets/mute.png',

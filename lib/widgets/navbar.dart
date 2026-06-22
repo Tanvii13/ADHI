@@ -14,7 +14,6 @@ class CustomNavbar extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-
           Row(
             children: [
               Icon(
@@ -22,9 +21,7 @@ class CustomNavbar extends StatelessWidget {
                 color: AppColors.darkGreen,
                 size: 40,
               ),
-
               const SizedBox(width: 10),
-
               const Text(
                 "ADHI",
                 style: TextStyle(
@@ -37,10 +34,10 @@ class CustomNavbar extends StatelessWidget {
 
           Row(
             children: [
-              navItem("Mission"),
               navItem("Vision"),
               navItem("Hearing"),
               navItem("Speech"),
+              navItem("Mission"),
               navItem("Impact"),
 
               const SizedBox(width: 25),
