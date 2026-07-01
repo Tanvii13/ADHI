@@ -6,7 +6,7 @@
 
 > *"Accessibility is not a privilege; it is a right."*
 
-ADHI is an intelligent, multimodal AI accessibility platform engineered to consolidate separate assistive utilities into a single, cohesive, software-first ecosystem[cite: 1]. Dedicated to the vision of empowering individuals with visual, hearing, and speech impairments, ADHI leverages generative cloud processing and computer vision frameworks to give **Sight to the Blind**, **Ears to the Deaf**, and a **Voice to the Non-Verbal**[cite: 1].
+ADHI is an intelligent, multimodal AI accessibility platform engineered to consolidate separate assistive utilities into a single, cohesive, software-first ecosystem. Dedicated to the vision of empowering individuals with visual, hearing, and speech impairments, ADHI leverages generative cloud processing and computer vision frameworks to give **Sight to the Blind**, **Ears to the Deaf**, and a **Voice to the Non-Verbal**[cite: 1].
 
 ---
 
